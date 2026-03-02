@@ -1,10 +1,6 @@
 # ✈️ AI Travel Planner
 
-An AI-powered travel planner that creates detailed day-by-day trip itineraries with real hotel prices, attractions, and budget breakdowns.
-
-Built with **Claude AI** + **Brightdata** web scraping.
-
-![Travel Planner Demo](https://placehold.co/800x400?text=AI+Travel+Planner)
+An AI-powered travel planner that creates detailed day-by-day trip itineraries with **real-time hotel price comparison** across Booking.com, TripAdvisor, and Airbnb — powered by Brightdata MCP web scraping and Claude AI.
 
 ## What it does
 
@@ -12,28 +8,48 @@ Type a prompt like:
 > "Plan a 4-day trip to Rome for $1000"
 
 And get back a complete travel plan including:
-- 🏨 Hotel recommendations with real prices
-- 📅 Day-by-day itinerary
-- 🗺️ Top sightseeing spots with entry fees
-- 💰 Full budget breakdown
-- 💡 Money-saving tips
+
+- 🏨 **3 hotel options side-by-side** — real prices compared from Booking.com, TripAdvisor, and Airbnb
+- 📅 **Day-by-day itinerary** — morning, afternoon, and evening activities
+- 🗺️ **Top sightseeing spots** with entry fees and tips
+- 💰 **Full budget breakdown** — hotel, food, transport, attractions
+- 💡 **Money-saving tips** specific to your destination
+
+## Hotel Comparison Feature
+
+The app searches 3 platforms in real time and shows them side by side:
+
+| Platform | Badge | Label |
+|----------|-------|-------|
+| Booking.com | 🔵 Blue | ⭐ Best Value |
+| TripAdvisor | 🟢 Green | 🏅 Top Rated |
+| Airbnb | 🔴 Red | 🏠 Local Experience |
+
+Each card shows: hotel name, price per night, rating, number of reviews, key features, and total cost for the trip.
 
 ## Tech Stack
 
 - **Backend**: Python + Flask
-- **AI Brain**: Anthropic Claude API (claude-sonnet-4-6)
-- **Web Scraping**: Brightdata SERP API
-- **Frontend**: HTML + CSS + JavaScript
+- **AI Brain**: Anthropic Claude API (`claude-sonnet-4-6`)
+- **Web Scraping**: Brightdata MCP (`search_engine`, `scrape_as_markdown`)
+- **Frontend**: HTML + CSS + JavaScript (no frameworks)
+
+## Requirements
+
+- Python 3.10+
+- Node.js 18+ (required for Brightdata MCP server)
+- Anthropic API key
+- Brightdata API token
 
 ## Setup
 
 ### 1. Clone the repo
 ```bash
-git clone https://github.com/YOUR_USERNAME/travel-planner.git
+git clone https://github.com/olgalitvinets-png/travel-planner.git
 cd travel-planner
 ```
 
-### 2. Install dependencies
+### 2. Install Python dependencies
 ```bash
 pip install -r requirements.txt
 ```
@@ -52,17 +68,17 @@ python app.py
 
 Open your browser at **http://localhost:5000**
 
-## Example Output
+### 5. Test Brightdata connection
+Visit **http://localhost:5000/test-brightdata** to verify Brightdata MCP is connected.
 
-**Prompt:** "Plan a 4-day trip to Rome for $1000"
+## Example
 
-The app returns:
-- Hotel: Hotel Navona (€65/night, 8.2/10 rating)
-- Day 1: Colosseum, Roman Forum, Trastevere dinner
-- Day 2: Vatican Museums, St. Peter's Basilica
-- Day 3: Borghese Gallery, Spanish Steps, Trevi Fountain
-- Day 4: Pantheon, Campo de' Fiori market
-- Total estimated cost: $920
+**Prompt:** `Plan a 4-day trip to Rome for $1000`
+
+**Output:**
+- 3 hotel options: Hotel Navona ($75/night on Booking.com) vs Hotel Campo de' Fiori ($90/night on TripAdvisor) vs Trastevere apartment ($65/night on Airbnb)
+- 4-day itinerary: Colosseum, Vatican, Borghese Gallery, Pantheon
+- Budget breakdown: Hotel $300 · Attractions $120 · Food $280 · Transport $60 · **Total $760**
 
 ## License
 
