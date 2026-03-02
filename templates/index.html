@@ -165,15 +165,113 @@
 
     .summary-box p { margin: 6px 0; color: #444; }
 
-    .hotel-section {
-      background: #fff8f0;
-      border-left: 4px solid #f59e0b;
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 20px;
+    /* Hotel comparison cards */
+    .hotel-comparison { margin-bottom: 20px; }
+
+    .hotel-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 14px;
     }
 
-    .hotel-section p { margin: 6px 0; color: #444; }
+    @media (max-width: 700px) {
+      .hotel-cards { grid-template-columns: 1fr; }
+    }
+
+    .hotel-card {
+      border: 2px solid #e8eeff;
+      border-radius: 14px;
+      padding: 18px;
+      position: relative;
+      background: white;
+      transition: box-shadow 0.2s;
+    }
+
+    .hotel-card:hover { box-shadow: 0 6px 24px rgba(102,126,234,0.15); }
+
+    .hotel-card.best-value {
+      border-color: #667eea;
+      background: #f8f9ff;
+    }
+
+    .platform-badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .platform-badge.booking  { background: #003580; color: white; }
+    .platform-badge.tripadvisor { background: #00aa6c; color: white; }
+    .platform-badge.airbnb   { background: #ff5a5f; color: white; }
+
+    .card-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 6px;
+    }
+
+    .hotel-card h3 {
+      font-size: 1rem;
+      color: #222;
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+
+    .hotel-price {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 4px;
+    }
+
+    .hotel-price span {
+      font-size: 0.85rem;
+      font-weight: 400;
+      color: #888;
+    }
+
+    .hotel-rating {
+      font-size: 0.85rem;
+      color: #666;
+      margin-bottom: 12px;
+    }
+
+    .hotel-features {
+      list-style: none;
+      margin-bottom: 14px;
+    }
+
+    .hotel-features li {
+      font-size: 0.85rem;
+      color: #555;
+      padding: 3px 0;
+    }
+
+    .hotel-features li::before { content: "✓ "; color: #10b981; font-weight: 700; }
+
+    .hotel-total {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #667eea;
+      background: #f0f3ff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .hotel-note {
+      margin-top: 12px;
+      font-size: 0.85rem;
+      color: #666;
+      font-style: italic;
+    }
 
     .day {
       background: #f8faff;
@@ -315,8 +413,9 @@
 
   <script>
     const loadingMessages = [
-      "Searching for hotels and attractions...",
-      "Checking real-time prices with Brightdata...",
+      "Searching hotels on Booking.com...",
+      "Comparing prices on TripAdvisor...",
+      "Checking Airbnb for local stays...",
       "Finding top sightseeing spots...",
       "Calculating your budget breakdown...",
       "Building your day-by-day itinerary...",

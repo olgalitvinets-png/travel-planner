@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-from travel_agent import create_travel_plan
+from travel_agent import create_travel_plan, test_brightdata_mcp
 
 app = Flask(__name__)
 
@@ -22,6 +22,13 @@ def plan():
         return jsonify({"plan": plan_html})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@app.route("/test-brightdata")
+def test_brightdata():
+    result = test_brightdata_mcp()
+    color = "green" if result.startswith("✅") else "red"
+    return f"<h2 style='color:{color}'>{result}</h2>"
 
 
 if __name__ == "__main__":
