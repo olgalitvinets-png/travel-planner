@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Travel Planner</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      color: white;
+      padding: 40px 0 30px;
+    }
+
+    header h1 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      margin-top: 8px;
+    }
+
+    .search-card {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      margin-bottom: 30px;
+    }
+
+    .search-card label {
+      display: block;
+      font-weight: 600;
+      color: #444;
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    #prompt {
+      flex: 1;
+      padding: 14px 18px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    #prompt:focus {
+      border-color: #667eea;
+    }
+
+    #planBtn {
+      padding: 14px 28px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    #planBtn:hover { opacity: 0.9; transform: translateY(-1px); }
+    #planBtn:active { transform: translateY(0); }
+    #planBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .examples {
+      margin-top: 14px;
+      font-size: 0.85rem;
+      color: #888;
+    }
+
+    .examples span {
+      display: inline-block;
+      background: #f3f4ff;
+      color: #667eea;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin: 3px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .examples span:hover { background: #e0e3ff; }
+
+    /* Loading state */
+    #loading {
+      display: none;
+      text-align: center;
+      background: white;
+      border-radius: 20px;
+      padding: 50px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      margin-bottom: 30px;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #f0f0f0;
+      border-top: 5px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #loading p { color: #666; font-size: 1rem; }
+    #loading .step { color: #667eea; font-weight: 600; margin-top: 8px; }
+
+    /* Results */
+    #result {
+      display: none;
+      background: white;
+      border-radius: 20px;
+      padding: 35px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      margin-bottom: 30px;
+    }
+
+    /* Plan styles */
+    .plan h2 {
+      color: #333;
+      font-size: 1.4rem;
+      margin: 25px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .plan h2:first-child { margin-top: 0; }
+
+    .summary-box {
+      background: linear-gradient(135deg, #667eea15, #764ba215);
+      border-left: 4px solid #667eea;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .summary-box p { margin: 6px 0; color: #444; }
+
+    .hotel-section {
+      background: #fff8f0;
+      border-left: 4px solid #f59e0b;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .hotel-section p { margin: 6px 0; color: #444; }
+
+    .day {
+      background: #f8faff;
+      border-radius: 12px;
+      padding: 18px 22px;
+      margin-bottom: 14px;
+      border: 1px solid #e8eeff;
+    }
+
+    .day h3 {
+      color: #667eea;
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+    }
+
+    .day ul { list-style: none; }
+    .day ul li {
+      padding: 5px 0;
+      color: #555;
+      border-bottom: 1px solid #eef0ff;
+    }
+
+    .day ul li:last-child { border-bottom: none; }
+
+    .day-cost {
+      margin-top: 10px;
+      font-weight: 600;
+      color: #667eea;
+      font-size: 0.9rem;
+    }
+
+    .budget-breakdown table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .budget-breakdown td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #f0f0f0;
+      color: #555;
+    }
+
+    .budget-breakdown td:last-child { text-align: right; font-weight: 500; }
+
+    .total-row td {
+      background: #667eea;
+      color: white !important;
+      font-weight: 700 !important;
+      border-radius: 4px;
+    }
+
+    .tips {
+      background: #f0fff4;
+      border-left: 4px solid #10b981;
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    .tips ul { list-style: none; }
+    .tips ul li {
+      padding: 5px 0;
+      color: #374151;
+    }
+
+    .tips ul li::before { content: "✓ "; color: #10b981; font-weight: 700; }
+
+    /* Error */
+    .error-box {
+      background: #fff5f5;
+      border: 1px solid #feb2b2;
+      border-radius: 12px;
+      padding: 20px;
+      color: #c53030;
+      text-align: center;
+    }
+
+    /* Print button */
+    .action-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .btn-outline {
+      padding: 10px 20px;
+      border: 2px solid #667eea;
+      color: #667eea;
+      background: white;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-outline:hover { background: #667eea; color: white; }
+
+    @media print {
+      body { background: white; }
+      .search-card, header, .action-bar { display: none; }
+      #result { box-shadow: none; padding: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>✈️ AI Travel Planner</h1>
+      <p>Powered by Claude AI + Brightdata — real prices, real plans</p>
+    </header>
+
+    <div class="search-card">
+      <label for="prompt">Describe your trip:</label>
+      <div class="input-row">
+        <input
+          type="text"
+          id="prompt"
+          placeholder="e.g. Plan a 4-day trip to Rome for $1000"
+        />
+        <button id="planBtn" onclick="generatePlan()">Plan My Trip ✈️</button>
+      </div>
+      <div class="examples">
+        Try:
+        <span onclick="useExample(this)">4 days in Rome, $1000 budget</span>
+        <span onclick="useExample(this)">Week in Barcelona, $1500 budget</span>
+        <span onclick="useExample(this)">3 days in Paris, $800 budget</span>
+        <span onclick="useExample(this)">5 days in Tokyo, $2000 budget</span>
+      </div>
+    </div>
+
+    <div id="loading">
+      <div class="spinner"></div>
+      <p>Your AI travel agent is working...</p>
+      <p class="step" id="loadingStep">Searching for hotels and attractions...</p>
+    </div>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const loadingMessages = [
+      "Searching for hotels and attractions...",
+      "Checking real-time prices with Brightdata...",
+      "Finding top sightseeing spots...",
+      "Calculating your budget breakdown...",
+      "Building your day-by-day itinerary...",
+      "Almost ready — polishing your travel plan..."
+    ];
+
+    let loadingInterval;
+
+    function useExample(el) {
+      document.getElementById("prompt").value = el.textContent;
+    }
+
+    function startLoadingMessages() {
+      let i = 0;
+      const stepEl = document.getElementById("loadingStep");
+      stepEl.textContent = loadingMessages[0];
+      loadingInterval = setInterval(() => {
+        i = (i + 1) % loadingMessages.length;
+        stepEl.textContent = loadingMessages[i];
+      }, 3000);
+    }
+
+    function stopLoadingMessages() {
+      clearInterval(loadingInterval);
+    }
+
+    async function generatePlan() {
+      const prompt = document.getElementById("prompt").value.trim();
+      if (!prompt) {
+        alert("Please enter your travel request first!");
+        return;
+      }
+
+      const btn = document.getElementById("planBtn");
+      const loading = document.getElementById("loading");
+      const result = document.getElementById("result");
+
+      btn.disabled = true;
+      btn.textContent = "Planning...";
+      loading.style.display = "block";
+      result.style.display = "none";
+      result.innerHTML = "";
+      startLoadingMessages();
+
+      try {
+        const response = await fetch("/plan", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt })
+        });
+
+        const data = await response.json();
+        stopLoadingMessages();
+        loading.style.display = "none";
+        result.style.display = "block";
+
+        if (data.error) {
+          result.innerHTML = `<div class="error-box">⚠️ ${data.error}</div>`;
+        } else {
+          result.innerHTML = `
+            <div class="action-bar">
+              <button class="btn-outline" onclick="window.print()">🖨️ Print Plan</button>
+              <button class="btn-outline" onclick="newSearch()">🔄 Plan Another Trip</button>
+            </div>
+            ${data.plan}
+          `;
+        }
+      } catch (err) {
+        stopLoadingMessages();
+        loading.style.display = "none";
+        result.style.display = "block";
+        result.innerHTML = `<div class="error-box">⚠️ Connection error. Make sure the server is running.</div>`;
+      }
+
+      btn.disabled = false;
+      btn.textContent = "Plan My Trip ✈️";
+    }
+
+    function newSearch() {
+      document.getElementById("result").style.display = "none";
+      document.getElementById("prompt").value = "";
+      document.getElementById("prompt").focus();
+    }
+
+    // Allow pressing Enter to submit
+    document.getElementById("prompt").addEventListener("keydown", function(e) {
+      if (e.key === "Enter") generatePlan();
+    });
+  </script>
+</body>
+</html>
